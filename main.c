@@ -80,8 +80,12 @@
 #define SCHED_MAX_EVENT_DATA_SIZE       sizeof(app_timer_event_t)                   /**< Maximum size of scheduler events. Note that scheduler BLE stack events do not contain any data, as the events are being pulled from the stack in the event handler. */
 #define SCHED_QUEUE_SIZE                10                                          /**< Maximum number of events in the scheduler queue. */
 
+#define LEDBUTTON_LED_PIN_NO            17
+
 static ble_gap_sec_params_t             m_sec_params;                               /**< Security requirements for this application. */
 static uint16_t                         m_conn_handle = BLE_CONN_HANDLE_INVALID;    /**< Handle of the current connection. */
+
+static ble_lbs_t                        m_lbs;
 
 // YOUR_JOB: Initialize UUIDs for service(s) used in your application.
 ble_uuid_t m_adv_uuids[] = {{BLE_UUID_BATTERY_SERVICE, BLE_UUID_TYPE_BLE}};         /**< Universally unique service identifiers. */
@@ -171,13 +175,30 @@ static void gap_params_init(void)
     APP_ERROR_CHECK(err_code);
 }
 
-
+static void led_write_handler(ble_lbs_t * p_lbs, uint8_t led_state)
+{
+		if (led_state)
+		{
+				nrf_gpio_pin_set(LEDBUTTON_LED_PIN_NO);
+		}
+		else
+		{
+				nrf_gpio_pin_clear(LEDBUTTON_LED_PIN_NO);
+		}
+} 
 
 /**@brief Function for initializing services that will be used by the application.
  */
 static void services_init(void)
 {
     // YOUR_JOB: Add code to initialize the services used by the application.
+		uint32_t err_code;
+	  ble_lbs_init_t init;
+
+	  init.led_write_handler = led_write_handler;
+
+	  err_code = ble_lbs_init(&m_lbs, &init);
+	  APP_ERROR_CHECK(err_code);
 }
 
 
@@ -413,6 +434,7 @@ static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
     YOUR_JOB: Add service ble_evt handlers calls here, like, for example:
     ble_bas_on_ble_evt(&m_bas, p_ble_evt);
     */
+		ble_lbs_on_ble_evt(&m_lbs, p_ble_evt);
 }
 
 
