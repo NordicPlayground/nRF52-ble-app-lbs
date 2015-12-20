@@ -1,0 +1,7 @@
+--cpu Cortex-M4.fp --pd "__EVAL SETA 1" -g --apcs=interwork --pd "__MICROLIB SETA 1"
+-I "C:\Users\Michael Dietz\Documents\nRF52_SDK_0.9.2_dbc28c9\examples\ble_peripheral\experimental_ble_app_blinky\pca10036\s132\arm5_no_packs\RTE"
+-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include
+-I C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_DeviceFamilyPack\8.0.3\Device\Include
+-I C:\Keil_v5\ARM\PACK\NordicSemiconductor\nRF_DeviceFamilyPack\8.3.2\Device\Include
+--pd "__UVISION_VERSION SETA 517" --pd "_RTE_ SETA 1" --pd "NRF52 SETA 1" --pd "BLE_STACK_SUPPORT_REQD SETA 1" --pd "BOARD_PCA10040 SETA 1" --pd "CONFIG_GPIO_AS_PINRESET SETA 1" --pd "S132 SETA 1" --pd "NRF52 SETA 1" --pd "SOFTDEVICE_PRESENT SETA 1" --pd "SWI_DISABLE0 SETA 1"
+--list .\_build\arm_startup_nrf52.lst --xref -o .\_build\arm_startup_nrf52.o --depend .\_build\arm_startup_nrf52.d "RTE\Device\nRF52832_xxAA\arm_startup_nrf52.s"
