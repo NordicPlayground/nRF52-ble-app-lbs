@@ -589,8 +589,8 @@ int main(void)
     bsp_module_init();
     scheduler_init();
     gap_params_init();
+		services_init();
     advertising_init();
-    services_init();
     conn_params_init();
     sec_params_init();
 
