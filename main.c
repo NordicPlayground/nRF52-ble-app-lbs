@@ -48,7 +48,7 @@
 // YOUR_JOB: Define any other buttons to be used by the applications:
 // #define MY_BUTTON_ID                   1
 
-#define DEVICE_NAME                     "Nordic_Template"                           /**< Name of device. Will be included in the advertising data. */
+#define DEVICE_NAME                     "Nordic_Blinky"                             /**< Name of device. Will be included in the advertising data. */
 
 #define APP_ADV_INTERVAL                64                                          /**< The advertising interval (in units of 0.625 ms. This value corresponds to 40 ms). */
 #define APP_ADV_TIMEOUT_IN_SECONDS      180                                         /**< The advertising timeout (in units of seconds). */
@@ -111,13 +111,13 @@ void assert_nrf_callback(uint16_t line_num, const uint8_t * p_file_name)
  *
  * @param[in] nrf_error  Error code containing information about what went wrong.
  */
-/*
+
 // YOUR_JOB: Uncomment this function and make it handle error situations sent back to your
 //           application by the services it uses.
 static void service_error_handler(uint32_t nrf_error)
 {
     APP_ERROR_HANDLER(nrf_error);
-} */
+}
 
 
 /**@brief Function for the Timer initialization.
