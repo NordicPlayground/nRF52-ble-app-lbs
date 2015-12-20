@@ -44,6 +44,11 @@
 #include "ble.h"
 #include "ble_srv_common.h"
 
+#define LBS_UUID_BASE        {0x23, 0xD1, 0xBC, 0xEA, 0x5F, 0x78, 0x23, 0x15, 0xDE, 0xEF, 0x12, 0x12, 0x00, 0x00, 0x00, 0x00}
+#define LBS_UUID_SERVICE     0x1523
+#define LBS_UUID_LED_CHAR    0x1525
+#define LBS_UUID_BUTTON_CHAR 0x1524
+
 // Forward declaration of the ble_lbs_t type. 
 typedef struct ble_lbs_s ble_lbs_t;
 
@@ -67,9 +72,9 @@ struct ble_lbs_s
 		ble_lbs_led_write_handler_t led_write_handler;
 };
 
-/**@brief Function for initializing the Battery Service.
+/**@brief Function for initializing the LED Button Service.
  *
- * @param[out]  p_lbs       Battery Service structure. This structure will have to be supplied by
+ * @param[out]  p_lbs       LED Button Service structure. This structure will have to be supplied by
  *                          the application. It will be initialized by this function, and will later
  *                          be used to identify this particular service instance.
  * @param[in]   p_lbs_init  Information needed to initialize the service.
