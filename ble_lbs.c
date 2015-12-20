@@ -24,10 +24,9 @@
 
 #define INVALID_BATTERY_LEVEL 255
 
-#if 0
 /**@brief Function for handling the Connect event.
  *
- * @param[in]   p_lbs       Battery Service structure.
+ * @param[in]   p_lbs       LED Button service structure.
  * @param[in]   p_ble_evt   Event received from the BLE stack.
  */
 static void on_connect(ble_lbs_t * p_lbs, ble_evt_t * p_ble_evt)
@@ -38,7 +37,7 @@ static void on_connect(ble_lbs_t * p_lbs, ble_evt_t * p_ble_evt)
 
 /**@brief Function for handling the Disconnect event.
  *
- * @param[in]   p_lbs       Battery Service structure.
+ * @param[in]   p_lbs       LED Button structure.
  * @param[in]   p_ble_evt   Event received from the BLE stack.
  */
 static void on_disconnect(ble_lbs_t * p_lbs, ble_evt_t * p_ble_evt)
@@ -47,59 +46,36 @@ static void on_disconnect(ble_lbs_t * p_lbs, ble_evt_t * p_ble_evt)
     p_lbs->conn_handle = BLE_CONN_HANDLE_INVALID;
 }
 
-
 /**@brief Function for handling the Write event.
  *
- * @param[in]   p_lbs       Battery Service structure.
+ * @param[in]   p_lbs       LED Button structure.
  * @param[in]   p_ble_evt   Event received from the BLE stack.
  */
 static void on_write(ble_lbs_t * p_lbs, ble_evt_t * p_ble_evt)
 {
-    if (p_lbs->is_notification_supported)
-    {
-        ble_gatts_evt_write_t * p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
+		ble_gatts_evt_write_t * p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
 
-        if (
-            (p_evt_write->handle == p_lbs->battery_level_handles.cccd_handle)
-            &&
-            (p_evt_write->len == 2)
-           )
-        {
-            // CCCD written, call application event handler
-            if (p_lbs->evt_handler != NULL)
-            {
-                ble_lbs_evt_t evt;
-
-                if (ble_srv_is_notification_enabled(p_evt_write->data))
-                {
-                    evt.evt_type = BLE_LBS_EVT_NOTIFICATION_ENABLED;
-                }
-                else
-                {
-                    evt.evt_type = BLE_LBS_EVT_NOTIFICATION_DISABLED;
-                }
-
-                p_lbs->evt_handler(p_lbs, &evt);
-            }
-        }
-    }
+		if ((p_evt_write->handle == p_lbs->led_char_handles.value_handle) && (p_evt_write->len == 1) 
+																																			&& (p_lbs->led_write_handler != NULL))
+		{
+				p_lbs->led_write_handler(p_lbs, p_evt_write->data[0]);
+		} 
 }
-#endif // 0
 
 void ble_lbs_on_ble_evt(ble_lbs_t * p_lbs, ble_evt_t * p_ble_evt)
 {
     switch (p_ble_evt->header.evt_id)
     {
         case BLE_GAP_EVT_CONNECTED:
-            //on_connect(p_lbs, p_ble_evt);
+            on_connect(p_lbs, p_ble_evt);
             break;
 
         case BLE_GAP_EVT_DISCONNECTED:
-            //on_disconnect(p_lbs, p_ble_evt);
+            on_disconnect(p_lbs, p_ble_evt);
             break;
 
         case BLE_GATTS_EVT_WRITE:
-            //on_write(p_lbs, p_ble_evt);
+            on_write(p_lbs, p_ble_evt);
             break;
 
         default:

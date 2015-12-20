@@ -371,7 +371,7 @@
             <vShortWch>0</vShortWch>
             <VariousControls>
               <MiscControls>--c99</MiscControls>
-              <Define>BLE_STACK_SUPPORT_REQD BOARD_PCA10036 CONFIG_GPIO_AS_PINRESET S132 NRF52 SOFTDEVICE_PRESENT SWI_DISABLE0</Define>
+              <Define>DEBUG BLE_STACK_SUPPORT_REQD BOARD_PCA10040 CONFIG_GPIO_AS_PINRESET S132 NRF52 SOFTDEVICE_PRESENT SWI_DISABLE0</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\config;..\..\..\..\..\bsp;..\..\..\..\..\..\components\softdevice\s132\headers;..\..\..\..\..\..\components\softdevice\s132\headers\nrf52;..\..\..\..\..\..\components\ble\common;..\..\..\..\..\..\components\libraries\timer;..\..\..\..\..\..\components\ble\ble_advertising;..\..\..\..\..\..\components\device;..\..\..\..\..\..\components\toolchain;..\..\..\..\..\..\components\drivers_nrf\hal;..\..\..\..\..\..\components\libraries\util;..\..\..\..\..\..\components\libraries\button;..\..\..\..\..\..\components\drivers_nrf\gpiote;..\..\..\..\..\..\components\drivers_nrf\config;..\..\..\..\..\..\components\drivers_nrf\common;..\..\..\..\..\..\components\softdevice\common\softdevice_handler;..\..\..\..\..\..\components\drivers_nrf\delay;..\..\..\..\..\..\components\libraries\scheduler;..\..\..\..\..\..\components\libraries\trace;..\..\..\..\..\..\components\drivers_nrf\pstorage;..\..\..\..\..\..\components\libraries\uart;..\..\..\..\..\..\components\drivers_nrf\uart</IncludePath>
             </VariousControls>
@@ -388,7 +388,7 @@
             <useXO>0</useXO>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>BLE_STACK_SUPPORT_REQD BOARD_PCA10036 CONFIG_GPIO_AS_PINRESET S132 NRF52 SOFTDEVICE_PRESENT SWI_DISABLE0</Define>
+              <Define>BLE_STACK_SUPPORT_REQD BOARD_PCA10040 CONFIG_GPIO_AS_PINRESET S132 NRF52 SOFTDEVICE_PRESENT SWI_DISABLE0</Define>
               <Undefine></Undefine>
               <IncludePath></IncludePath>
             </VariousControls>
@@ -1735,7 +1735,7 @@
             <RestoreSysVw>1</RestoreSysVw>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
-          <TargetSelection>7</TargetSelection>
+          <TargetSelection>6</TargetSelection>
           <SimDlls>
             <CpuDll></CpuDll>
             <CpuDllArguments></CpuDllArguments>
