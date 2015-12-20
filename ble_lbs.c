@@ -21,9 +21,6 @@
 #include "ble_srv_common.h"
 #include "app_util.h"
 
-
-#define INVALID_BATTERY_LEVEL 255
-
 /**@brief Function for handling the Connect event.
  *
  * @param[in]   p_lbs       LED Button service structure.
@@ -60,6 +57,20 @@ static void on_write(ble_lbs_t * p_lbs, ble_evt_t * p_ble_evt)
 		{
 				p_lbs->led_write_handler(p_lbs, p_evt_write->data[0]);
 		} 
+}
+
+uint32_t ble_lbs_on_button_change(ble_lbs_t * p_lbs, uint8_t button_state)
+{
+		ble_gatts_hvx_params_t params;
+		uint16_t len = sizeof(button_state);
+
+		memset(&params, 0, sizeof(params));
+		params.type = BLE_GATT_HVX_NOTIFICATION;
+		params.handle = p_lbs->button_char_handles.value_handle;
+		params.p_data = &button_state;
+		params.p_len = &len;
+
+		return sd_ble_gatts_hvx(p_lbs->conn_handle, &params);
 }
 
 void ble_lbs_on_ble_evt(ble_lbs_t * p_lbs, ble_evt_t * p_ble_evt)
