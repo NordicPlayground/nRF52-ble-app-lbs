@@ -195,7 +195,8 @@ static uint32_t button_char_add(ble_lbs_t * p_lbs)
     char_md.p_cccd_md         = &cccd_md;
     char_md.p_sccd_md         = NULL;
 
-    BLE_UUID_BLE_ASSIGN(ble_uuid, LBS_UUID_BUTTON_CHAR);
+		ble_uuid.type = p_lbs->uuid_type;
+		ble_uuid.uuid = LBS_UUID_BUTTON_CHAR;
 
     memset(&attr_md, 0, sizeof(attr_md));
 
@@ -236,20 +237,30 @@ uint32_t ble_lbs_init(ble_lbs_t * p_lbs, const ble_lbs_init_t * p_lbs_init)
 		err_code = sd_ble_uuid_vs_add(&base_uuid, &p_lbs->uuid_type);
 		if (err_code != NRF_SUCCESS)
 		{
-		 return err_code;
+				return err_code;
 		}
 		
 		// Add service
-    BLE_UUID_BLE_ASSIGN(ble_uuid, LBS_UUID_SERVICE);
 		ble_uuid.type = p_lbs->uuid_type;
 		ble_uuid.uuid = LBS_UUID_SERVICE;
 		
 		err_code = sd_ble_gatts_service_add(BLE_GATTS_SRVC_TYPE_PRIMARY, &ble_uuid, &p_lbs->service_handle);
 		if (err_code != NRF_SUCCESS)
 		{
-		return err_code;
+				return err_code;
 		}
 		
-    // Add battery level characteristic
-    return NRF_SUCCESS;
+		// Add characteristics
+		err_code = button_char_add(p_lbs);
+		if (err_code != NRF_SUCCESS)
+		{
+				return err_code;
+		}
+		err_code = led_char_add(p_lbs);
+		if (err_code != NRF_SUCCESS)
+		{
+				return err_code;
+		}
+
+		return NRF_SUCCESS;
 }
