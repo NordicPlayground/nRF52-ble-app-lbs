@@ -40,6 +40,7 @@
 #include "softdevice_handler.h"
 #include "app_timer_appsh.h"
 #include "bsp.h"
+#include "ble_lbs.h"
 
 #define IS_SRVC_CHANGED_CHARACT_PRESENT 0                                           /**< Include or not the service_changed characteristic. if not enabled, the server's database cannot be changed for the lifetime of the device*/
 
