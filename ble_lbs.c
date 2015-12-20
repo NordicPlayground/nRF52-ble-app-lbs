@@ -84,22 +84,22 @@ static void on_write(ble_lbs_t * p_lbs, ble_evt_t * p_ble_evt)
         }
     }
 }
-
+#endif // 0
 
 void ble_lbs_on_ble_evt(ble_lbs_t * p_lbs, ble_evt_t * p_ble_evt)
 {
     switch (p_ble_evt->header.evt_id)
     {
         case BLE_GAP_EVT_CONNECTED:
-            on_connect(p_lbs, p_ble_evt);
+            //on_connect(p_lbs, p_ble_evt);
             break;
 
         case BLE_GAP_EVT_DISCONNECTED:
-            on_disconnect(p_lbs, p_ble_evt);
+            //on_disconnect(p_lbs, p_ble_evt);
             break;
 
         case BLE_GATTS_EVT_WRITE:
-            on_write(p_lbs, p_ble_evt);
+            //on_write(p_lbs, p_ble_evt);
             break;
 
         default:
@@ -107,7 +107,6 @@ void ble_lbs_on_ble_evt(ble_lbs_t * p_lbs, ble_evt_t * p_ble_evt)
             break;
     }
 }
-#endif // 0
 
 /**@brief Function for adding the LED characteristic.
  *
