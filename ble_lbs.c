@@ -107,16 +107,16 @@ void ble_lbs_on_ble_evt(ble_lbs_t * p_lbs, ble_evt_t * p_ble_evt)
             break;
     }
 }
+#endif // 0
 
-
-/**@brief Function for adding the Battery Level characteristic.
+/**@brief Function for adding the Button characteristic.
  *
- * @param[in]   p_lbs        Battery Service structure.
+ * @param[in]   p_lbs        LED Button Service structure.
  * @param[in]   p_lbs_init   Information needed to initialize the service.
  *
  * @return      NRF_SUCCESS on success, otherwise an error code.
  */
-static uint32_t battery_level_char_add(ble_lbs_t * p_lbs, const ble_lbs_init_t * p_lbs_init)
+static uint32_t button_char_add(ble_lbs_t * p_lbs)
 {
     uint32_t            err_code;
     ble_gatts_char_md_t char_md;
@@ -124,44 +124,34 @@ static uint32_t battery_level_char_add(ble_lbs_t * p_lbs, const ble_lbs_init_t *
     ble_gatts_attr_t    attr_char_value;
     ble_uuid_t          ble_uuid;
     ble_gatts_attr_md_t attr_md;
-    uint8_t             initial_battery_level;
-    uint8_t             encoded_report_ref[BLE_SRV_ENCODED_REPORT_REF_LEN];
-    uint8_t             init_len;
 
-    // Add Battery Level characteristic
-    if (p_lbs->is_notification_supported)
-    {
-        memset(&cccd_md, 0, sizeof(cccd_md));
+    // Add Button characteristic
+		memset(&cccd_md, 0, sizeof(cccd_md));
 
-        // According to BAS_SPEC_V10, the read operation on cccd should be possible without
-        // authentication.
-        BLE_GAP_CONN_SEC_MODE_SET_OPEN(&cccd_md.read_perm);
-        cccd_md.write_perm = p_lbs_init->battery_level_char_attr_md.cccd_write_perm;
-        cccd_md.vloc       = BLE_GATTS_VLOC_STACK;
-    }
+		BLE_GAP_CONN_SEC_MODE_SET_OPEN(&cccd_md.read_perm);
+		BLE_GAP_CONN_SEC_MODE_SET_OPEN(&cccd_md.write_perm);
+		cccd_md.vloc       = BLE_GATTS_VLOC_STACK;
 
     memset(&char_md, 0, sizeof(char_md));
 
     char_md.char_props.read   = 1;
-    char_md.char_props.notify = (p_lbs->is_notification_supported) ? 1 : 0;
+    char_md.char_props.notify = 1;
     char_md.p_char_user_desc  = NULL;
     char_md.p_char_pf         = NULL;
     char_md.p_user_desc_md    = NULL;
-    char_md.p_cccd_md         = (p_lbs->is_notification_supported) ? &cccd_md : NULL;
+    char_md.p_cccd_md         = &cccd_md;
     char_md.p_sccd_md         = NULL;
 
-    BLE_UUID_BLE_ASSIGN(ble_uuid, BLE_UUID_BATTERY_LEVEL_CHAR);
+    BLE_UUID_BLE_ASSIGN(ble_uuid, LBS_UUID_BUTTON_CHAR);
 
     memset(&attr_md, 0, sizeof(attr_md));
 
-    attr_md.read_perm  = p_lbs_init->battery_level_char_attr_md.read_perm;
-    attr_md.write_perm = p_lbs_init->battery_level_char_attr_md.write_perm;
+    BLE_GAP_CONN_SEC_MODE_SET_OPEN(&attr_md.read_perm);
+		BLE_GAP_CONN_SEC_MODE_SET_NO_ACCESS(&attr_md.write_perm);
     attr_md.vloc       = BLE_GATTS_VLOC_STACK;
     attr_md.rd_auth    = 0;
     attr_md.wr_auth    = 0;
     attr_md.vlen       = 0;
-
-    initial_battery_level = p_lbs_init->initial_batt_level;
 
     memset(&attr_char_value, 0, sizeof(attr_char_value));
 
@@ -170,58 +160,15 @@ static uint32_t battery_level_char_add(ble_lbs_t * p_lbs, const ble_lbs_init_t *
     attr_char_value.init_len  = sizeof(uint8_t);
     attr_char_value.init_offs = 0;
     attr_char_value.max_len   = sizeof(uint8_t);
-    attr_char_value.p_value   = &initial_battery_level;
+    attr_char_value.p_value   = NULL;
 
-    err_code = sd_ble_gatts_characteristic_add(p_lbs->service_handle, &char_md,
-                                               &attr_char_value,
-                                               &p_lbs->battery_level_handles);
     if (err_code != NRF_SUCCESS)
     {
         return err_code;
     }
 
-    if (p_lbs_init->p_report_ref != NULL)
-    {
-        // Add Report Reference descriptor
-        BLE_UUID_BLE_ASSIGN(ble_uuid, BLE_UUID_REPORT_REF_DESCR);
-
-        memset(&attr_md, 0, sizeof(attr_md));
-
-        attr_md.read_perm = p_lbs_init->battery_level_report_read_perm;
-        BLE_GAP_CONN_SEC_MODE_SET_NO_ACCESS(&attr_md.write_perm);
-
-        attr_md.vloc    = BLE_GATTS_VLOC_STACK;
-        attr_md.rd_auth = 0;
-        attr_md.wr_auth = 0;
-        attr_md.vlen    = 0;
-        
-        init_len = ble_srv_report_ref_encode(encoded_report_ref, p_lbs_init->p_report_ref);
-        
-        memset(&attr_char_value, 0, sizeof(attr_char_value));
-
-        attr_char_value.p_uuid    = &ble_uuid;
-        attr_char_value.p_attr_md = &attr_md;
-        attr_char_value.init_len  = init_len;
-        attr_char_value.init_offs = 0;
-        attr_char_value.max_len   = attr_char_value.init_len;
-        attr_char_value.p_value   = encoded_report_ref;
-
-        err_code = sd_ble_gatts_descriptor_add(p_lbs->battery_level_handles.value_handle,
-                                               &attr_char_value,
-                                               &p_lbs->report_ref_handle);
-        if (err_code != NRF_SUCCESS)
-        {
-            return err_code;
-        }
-    }
-    else
-    {
-        p_lbs->report_ref_handle = BLE_GATT_HANDLE_INVALID;
-    }
-
-    return NRF_SUCCESS;
+    return sd_ble_gatts_characteristic_add(p_lbs->service_handle, &char_md, &attr_char_value, &p_lbs->button_char_handles);
 }
-#endif // 0
 
 uint32_t ble_lbs_init(ble_lbs_t * p_lbs, const ble_lbs_init_t * p_lbs_init)
 {

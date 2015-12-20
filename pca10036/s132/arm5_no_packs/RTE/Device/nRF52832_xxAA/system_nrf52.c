@@ -88,7 +88,7 @@ void SystemInit(void)
     /* Workaround for Errata 66 "TEMP: Linearity specification not met with default settings" found at the Errata document 
        for your device located at https://infocenter.nordicsemi.com/  */
     if (errata_66()){        
-        NRF_TEMP->A0 = NRF_FICR->TEMP.A0;
+        /*NRF_TEMP->A0 = NRF_FICR->TEMP.A0;
         NRF_TEMP->A1 = NRF_FICR->TEMP.A1;
         NRF_TEMP->A2 = NRF_FICR->TEMP.A2;
         NRF_TEMP->A3 = NRF_FICR->TEMP.A3;
@@ -104,7 +104,7 @@ void SystemInit(void)
         NRF_TEMP->T1 = NRF_FICR->TEMP.T1;
         NRF_TEMP->T2 = NRF_FICR->TEMP.T2;
         NRF_TEMP->T3 = NRF_FICR->TEMP.T3;
-        NRF_TEMP->T4 = NRF_FICR->TEMP.T4;
+        NRF_TEMP->T4 = NRF_FICR->TEMP.T4;*/
     }
     
     /* Enable the FPU if the compiler used floating point unit instructions. __FPU_USED is a MACRO defined by the 
