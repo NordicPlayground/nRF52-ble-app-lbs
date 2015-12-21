@@ -12,16 +12,11 @@
 
 /** @file
  *
- * @defgroup ble_sdk_app_template_main main.c
- * @{
- * @ingroup ble_sdk_app_template
- * @brief Template project main file.
- *
- * This file contains a template for creating a new application. It has the code necessary to wakeup
+ * This file is based off the template for creating a new application. It has the code necessary to wakeup
  * from button, advertise, get a connection restart advertising on disconnect and if no new
  * connection created go back to system-off mode.
- * It can easily be used as a starting point for creating a new application, the comments identified
- * with 'YOUR_JOB' indicates where and how you can customize.
+ * This application, nRF52-ble-lbs, can toggle an LED on the nRF52
+ * from a BLE central and also read and be notified of a button press on the nRF52.
  */
 
 #include <stdint.h>
@@ -46,8 +41,6 @@
 #define IS_SRVC_CHANGED_CHARACT_PRESENT 1                                           /**< Include or not the service_changed characteristic. if not enabled, the server's database cannot be changed for the lifetime of the device*/
 
 #define WAKEUP_BUTTON_ID                0                                           /**< Button used to wake up the application. */
-// YOUR_JOB: Define any other buttons to be used by the applications:
-// #define MY_BUTTON_ID                   1
 
 #define DEVICE_NAME                     "Nordic_Blinky"                             /**< Name of device. Will be included in the advertising data. */
 
@@ -81,7 +74,7 @@
 #define SCHED_MAX_EVENT_DATA_SIZE       sizeof(app_timer_event_t)                   /**< Maximum size of scheduler events. Note that scheduler BLE stack events do not contain any data, as the events are being pulled from the stack in the event handler. */
 #define SCHED_QUEUE_SIZE                10                                          /**< Maximum number of events in the scheduler queue. */
 
-#define LEDBUTTON_LED_PIN_NO            BSP_LED_0_MASK
+#define LEDBUTTON_LED_PIN_NO            BSP_LED_1_MASK
 
 static ble_gap_sec_params_t             m_sec_params;                               /**< Security requirements for this application. */
 static uint16_t                         m_conn_handle = BLE_CONN_HANDLE_INVALID;    /**< Handle of the current connection. */
@@ -115,10 +108,10 @@ void assert_nrf_callback(uint16_t line_num, const uint8_t * p_file_name)
 
 // YOUR_JOB: Uncomment this function and make it handle error situations sent back to your
 //           application by the services it uses.
-static void service_error_handler(uint32_t nrf_error)
+/*static void service_error_handler(uint32_t nrf_error)
 {
     APP_ERROR_HANDLER(nrf_error);
-}
+}*/
 
 
 /**@brief Function for the Timer initialization.
@@ -172,6 +165,8 @@ static void gap_params_init(void)
     APP_ERROR_CHECK(err_code);
 }
 
+/**@brief Function called by LED Button Service to toggle an LED when LED characteristic is written by BLE central.
+ */
 void led_write_handler(ble_lbs_t * p_lbs, uint8_t led_state)
 {
 		if (led_state)
@@ -555,7 +550,7 @@ static void bsp_event_handler(bsp_event_t evt)
 						break;
 
 				default:
-						APP_ERROR_HANDLER(evt);
+						// APP_ERROR_HANDLER(evt);
 						break;
 		}
 }

@@ -17,6 +17,7 @@
 
 #include <string.h>
 #include "nordic_common.h"
+
 #include "ble_srv_common.h"
 #include "app_util.h"
 #include "ble_lbs.h"
@@ -109,7 +110,7 @@ static uint32_t led_char_add(ble_lbs_t * p_lbs)
     ble_uuid_t          ble_uuid;
     ble_gatts_attr_md_t attr_md;
 
-    // Add LED characteristic
+    // Add LED characteristic.
     memset(&char_md, 0, sizeof(char_md));
 
     char_md.char_props.read   = 1;
@@ -164,7 +165,7 @@ static uint32_t button_char_add(ble_lbs_t * p_lbs)
     ble_uuid_t          ble_uuid;
     ble_gatts_attr_md_t attr_md;
 
-    // Add Button characteristic
+    // Add Button characteristic.
 		memset(&cccd_md, 0, sizeof(cccd_md));
 
 		BLE_GAP_CONN_SEC_MODE_SET_OPEN(&cccd_md.read_perm);
@@ -216,7 +217,7 @@ uint32_t ble_lbs_init(ble_lbs_t * p_lbs, const ble_lbs_init_t * p_lbs_init)
 	  ble_uuid128_t base_uuid = LBS_UUID_BASE;
     ble_uuid_t    ble_uuid;
 
-    // Initialize service structure
+    // Initialize service structure.
     p_lbs->conn_handle       = BLE_CONN_HANDLE_INVALID;
 	  p_lbs->led_write_handler = p_lbs_init->led_write_handler;
 
@@ -226,7 +227,7 @@ uint32_t ble_lbs_init(ble_lbs_t * p_lbs, const ble_lbs_init_t * p_lbs_init)
 				return err_code;
 		}
 		
-		// Add service
+		// Add service.
 		ble_uuid.type = p_lbs->uuid_type;
 		ble_uuid.uuid = LBS_UUID_SERVICE;
 		
@@ -236,7 +237,7 @@ uint32_t ble_lbs_init(ble_lbs_t * p_lbs, const ble_lbs_init_t * p_lbs_init)
 				return err_code;
 		}
 		
-		// Add characteristics
+		// Add characteristics.
 		err_code = button_char_add(p_lbs);
 		if (err_code != NRF_SUCCESS)
 		{
