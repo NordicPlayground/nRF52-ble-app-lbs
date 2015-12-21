@@ -12,20 +12,16 @@
 
 /** @file
  *
- * @defgroup ble_sdk_app_template_main main.c
- * @{
- * @ingroup ble_sdk_app_template
- * @brief Template project main file.
- *
- * This file contains a template for creating a new application. It has the code necessary to wakeup
+ * This file is based off the template for creating a new application. It has the code necessary to wakeup
  * from button, advertise, get a connection restart advertising on disconnect and if no new
  * connection created go back to system-off mode.
- * It can easily be used as a starting point for creating a new application, the comments identified
- * with 'YOUR_JOB' indicates where and how you can customize.
+ * This application, nRF52-ble-lbs, can toggle an LED on the nRF52
+ * from a BLE central and also read and be notified of a button press on the nRF52.
  */
 
 #include <stdint.h>
 #include <string.h>
+#include <stdbool.h>
 #include "nordic_common.h"
 #include "nrf.h"
 #include "app_error.h"
@@ -40,14 +36,13 @@
 #include "softdevice_handler.h"
 #include "app_timer_appsh.h"
 #include "bsp.h"
+#include "ble_lbs.h"
 
-#define IS_SRVC_CHANGED_CHARACT_PRESENT 0                                           /**< Include or not the service_changed characteristic. if not enabled, the server's database cannot be changed for the lifetime of the device*/
+#define IS_SRVC_CHANGED_CHARACT_PRESENT 1                                           /**< Include or not the service_changed characteristic. if not enabled, the server's database cannot be changed for the lifetime of the device*/
 
 #define WAKEUP_BUTTON_ID                0                                           /**< Button used to wake up the application. */
-// YOUR_JOB: Define any other buttons to be used by the applications:
-// #define MY_BUTTON_ID                   1
 
-#define DEVICE_NAME                     "Nordic_Template"                           /**< Name of device. Will be included in the advertising data. */
+#define DEVICE_NAME                     "Nordic_Blinky"                             /**< Name of device. Will be included in the advertising data. */
 
 #define APP_ADV_INTERVAL                64                                          /**< The advertising interval (in units of 0.625 ms. This value corresponds to 40 ms). */
 #define APP_ADV_TIMEOUT_IN_SECONDS      180                                         /**< The advertising timeout (in units of seconds). */
@@ -79,12 +74,12 @@
 #define SCHED_MAX_EVENT_DATA_SIZE       sizeof(app_timer_event_t)                   /**< Maximum size of scheduler events. Note that scheduler BLE stack events do not contain any data, as the events are being pulled from the stack in the event handler. */
 #define SCHED_QUEUE_SIZE                10                                          /**< Maximum number of events in the scheduler queue. */
 
+#define LEDBUTTON_LED_PIN_NO            BSP_LED_1_MASK
+
 static ble_gap_sec_params_t             m_sec_params;                               /**< Security requirements for this application. */
 static uint16_t                         m_conn_handle = BLE_CONN_HANDLE_INVALID;    /**< Handle of the current connection. */
 
-// YOUR_JOB: Initialize UUIDs for service(s) used in your application.
-ble_uuid_t m_adv_uuids[] = {{BLE_UUID_BATTERY_SERVICE, BLE_UUID_TYPE_BLE}};         /**< Universally unique service identifiers. */
-
+static ble_lbs_t                        m_lbs;
 
 /**@brief Callback function for asserts in the SoftDevice.
  *
@@ -110,13 +105,13 @@ void assert_nrf_callback(uint16_t line_num, const uint8_t * p_file_name)
  *
  * @param[in] nrf_error  Error code containing information about what went wrong.
  */
-/*
+
 // YOUR_JOB: Uncomment this function and make it handle error situations sent back to your
 //           application by the services it uses.
-static void service_error_handler(uint32_t nrf_error)
+/*static void service_error_handler(uint32_t nrf_error)
 {
     APP_ERROR_HANDLER(nrf_error);
-} */
+}*/
 
 
 /**@brief Function for the Timer initialization.
@@ -170,13 +165,33 @@ static void gap_params_init(void)
     APP_ERROR_CHECK(err_code);
 }
 
-
+/**@brief Function called by LED Button Service to toggle an LED when LED characteristic is written by BLE central.
+ */
+void led_write_handler(ble_lbs_t * p_lbs, uint8_t led_state)
+{
+		if (led_state)
+		{
+				LEDS_ON(LEDBUTTON_LED_PIN_NO);
+		}
+		else
+		{
+				LEDS_OFF(LEDBUTTON_LED_PIN_NO);
+		}
+} 
 
 /**@brief Function for initializing services that will be used by the application.
  */
 static void services_init(void)
 {
     // YOUR_JOB: Add code to initialize the services used by the application.
+		uint32_t err_code;
+	  ble_lbs_init_t init;
+
+	  init.led_write_handler = led_write_handler;
+
+		memset(&m_lbs, 0, sizeof(m_lbs));
+	  err_code = ble_lbs_init(&m_lbs, &init);
+	  APP_ERROR_CHECK(err_code);
 }
 
 
@@ -412,6 +427,7 @@ static void ble_evt_dispatch(ble_evt_t * p_ble_evt)
     YOUR_JOB: Add service ble_evt handlers calls here, like, for example:
     ble_bas_on_ble_evt(&m_bas, p_ble_evt);
     */
+		ble_lbs_on_ble_evt(&m_lbs, p_ble_evt);
 }
 
 
@@ -467,6 +483,10 @@ static void advertising_init(void)
 {
     uint32_t      err_code;
     ble_advdata_t advdata;
+		ble_advdata_t scanrsp;
+	
+		// YOUR_JOB: Use UUIDs for service(s) used in your application.
+		ble_uuid_t adv_uuids[] = {{LBS_UUID_SERVICE, m_lbs.uuid_type}};
 
     // Build advertising data struct to pass into @ref ble_advertising_init.
     memset(&advdata, 0, sizeof(advdata));
@@ -474,15 +494,17 @@ static void advertising_init(void)
     advdata.name_type               = BLE_ADVDATA_FULL_NAME;
     advdata.include_appearance      = true;
     advdata.flags                   = BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE;
-    advdata.uuids_complete.uuid_cnt = sizeof(m_adv_uuids) / sizeof(m_adv_uuids[0]);
-    advdata.uuids_complete.p_uuids  = m_adv_uuids;
+		
+		memset(&scanrsp, 0, sizeof(scanrsp));
+		scanrsp.uuids_complete.uuid_cnt = sizeof(adv_uuids) / sizeof(adv_uuids[0]);
+		scanrsp.uuids_complete.p_uuids = adv_uuids;
 
     ble_adv_modes_config_t options = {0};
     options.ble_adv_fast_enabled  = BLE_ADV_FAST_ENABLED;
     options.ble_adv_fast_interval = APP_ADV_INTERVAL;
     options.ble_adv_fast_timeout  = APP_ADV_TIMEOUT_IN_SECONDS;
 
-    err_code = ble_advertising_init(&advdata, NULL, &options, on_adv_evt, NULL);
+    err_code = ble_advertising_init(&advdata, &scanrsp, &options, on_adv_evt, NULL);
     APP_ERROR_CHECK(err_code);
 }
 
@@ -499,24 +521,39 @@ static void scheduler_init(void)
  *
  * @param[in]     evt                        BSP event.
  */
-/* YOUR_JOB: Uncomment this function if you need to handle button events.
+// YOUR_JOB: Uncomment this function if you need to handle button events.
 static void bsp_event_handler(bsp_event_t evt)
 {
-        switch (evt)
-        {
-            case BSP_EVENT_KEY_0:
-                // Code to handle BSP_EVENT_KEY_0
-                break;
+		uint32_t err_code;
+		static bool button_state = false;
+		
+		switch (evt)
+		{
+				// Handle any other event
+				case BSP_EVENT_KEY_0:
+						if (button_state)
+						{
+								err_code = ble_lbs_on_button_change(&m_lbs, 0);
+						}
+						else
+						{
+								err_code = ble_lbs_on_button_change(&m_lbs, 1);
+						}
+						button_state = !button_state;
 
-            // Handle any other event
+						if (err_code != NRF_SUCCESS &&
+								err_code != BLE_ERROR_INVALID_CONN_HANDLE &&
+								err_code != NRF_ERROR_INVALID_STATE)
+						{
+								APP_ERROR_CHECK(err_code);
+						}
+						break;
 
-            default:
-                APP_ERROR_HANDLER(evt);
-                break;
-        }
-    }
+				default:
+						// APP_ERROR_HANDLER(evt);
+						break;
+		}
 }
-*/
 
 /**@brief Function for the Power manager.
  */
@@ -526,25 +563,20 @@ static void power_manage(void)
     APP_ERROR_CHECK(err_code);
 }
 
-
 /**@brief Function for initializing bsp module.
  */
 static void bsp_module_init(void)
 {
     uint32_t err_code;
-    // Note: If the only use of buttons is to wake up, bsp_event_handler can be NULL.
-    err_code = bsp_init(BSP_INIT_LED | BSP_INIT_BUTTONS, APP_TIMER_TICKS(100, APP_TIMER_PRESCALER), NULL);
-    APP_ERROR_CHECK(err_code);
     // Note: If the buttons will be used to do some task, assign bsp_event_handler, as shown below.
-    //  err_code = bsp_init(BSP_INIT_LED | BSP_INIT_BUTTONS, APP_TIMER_TICKS(100, APP_TIMER_PRESCALER), bsp_event_handler);
-    //  APP_ERROR_CHECK(err_code);
+    err_code = bsp_init(BSP_INIT_LED | BSP_INIT_BUTTONS, APP_TIMER_TICKS(100, APP_TIMER_PRESCALER), bsp_event_handler);
+    APP_ERROR_CHECK(err_code);
 
     // You can (if you configured an event handler) choose to assign events to buttons beyond the default configuration.
     // E.g:
-    //  uint32_t err_code = bsp_event_to_button_assign(BUTTON_0_ID, BSP_EVENT_KEY_SLEEP);
-    //  APP_ERROR_CHECK(err_code);
+    // err_code = bsp_event_to_button_action_assign(0, BSP_BUTTON_ACTION_RELEASE, BSP_EVENT_NOTHING);
+    // APP_ERROR_CHECK(err_code);
 }
-
 
 /**@brief Function for application main entry.
  */
@@ -558,8 +590,8 @@ int main(void)
     bsp_module_init();
     scheduler_init();
     gap_params_init();
+		services_init();
     advertising_init();
-    services_init();
     conn_params_init();
     sec_params_init();
 
@@ -567,7 +599,8 @@ int main(void)
     timers_start();
     err_code = ble_advertising_start(BLE_ADV_MODE_FAST);
     APP_ERROR_CHECK(err_code);
-    // Enter main loop
+    
+		// Enter main loop
     for (;;)
     {
         app_sched_execute();
