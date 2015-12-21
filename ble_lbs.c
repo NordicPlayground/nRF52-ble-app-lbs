@@ -15,11 +15,11 @@
 *  qualification listings, this section of source code must not be modified.
 */
 
-#include "ble_lbs.h"
 #include <string.h>
 #include "nordic_common.h"
 #include "ble_srv_common.h"
 #include "app_util.h"
+#include "ble_lbs.h"
 
 /**@brief Function for handling the Connect event.
  *
