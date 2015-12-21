@@ -58,12 +58,12 @@ typedef struct
 /**@brief LED Button Service structure. This contains various status information for the service. */
 struct ble_lbs_s
 {
-		uint16_t service_handle;
-		ble_gatts_char_handles_t led_char_handles;
-		ble_gatts_char_handles_t button_char_handles;
-		uint8_t uuid_type;
-		uint16_t conn_handle;
-		ble_lbs_led_write_handler_t led_write_handler;
+	uint16_t service_handle;
+	ble_gatts_char_handles_t led_char_handles;
+	ble_gatts_char_handles_t button_char_handles;
+	uint8_t uuid_type;
+	uint16_t conn_handle;
+	ble_lbs_led_write_handler_t led_write_handler;
 };
 
 /**@brief Function for initializing the LED Button Service.

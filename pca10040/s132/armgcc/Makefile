@@ -1,4 +1,4 @@
-PROJECT_NAME := ble_app_template_s132_pca10036
+PROJECT_NAME := ble_app_template_s132_pca10040
 
 export OUTPUT_FILENAME
 #MAKEFILE_NAME := $(CURDIR)/$(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))
@@ -23,14 +23,14 @@ NO_ECHO := @
 endif
 
 # Toolchain commands
-CC              := '$(GNU_INSTALL_ROOT)/bin/$(GNU_PREFIX)-gcc'
-AS              := '$(GNU_INSTALL_ROOT)/bin/$(GNU_PREFIX)-as'
-AR              := '$(GNU_INSTALL_ROOT)/bin/$(GNU_PREFIX)-ar' -r
-LD              := '$(GNU_INSTALL_ROOT)/bin/$(GNU_PREFIX)-ld'
-NM              := '$(GNU_INSTALL_ROOT)/bin/$(GNU_PREFIX)-nm'
-OBJDUMP         := '$(GNU_INSTALL_ROOT)/bin/$(GNU_PREFIX)-objdump'
-OBJCOPY         := '$(GNU_INSTALL_ROOT)/bin/$(GNU_PREFIX)-objcopy'
-SIZE            := '$(GNU_INSTALL_ROOT)/bin/$(GNU_PREFIX)-size'
+CC              := '$(GNU_PREFIX)-gcc'
+AS              := '$(GNU_PREFIX)-as'
+AR              := '$(GNU_PREFIX)-ar' -r
+LD              := '$(GNU_PREFIX)-ld'
+NM              := '$(GNU_PREFIX)-nm'
+OBJDUMP         := '$(GNU_PREFIX)-objdump'
+OBJCOPY         := '$(GNU_PREFIX)-objcopy'
+SIZE            := '$(GNU_PREFIX)-size'
 
 #function for removing duplicates in a list
 remduplicates = $(strip $(if $1,$(firstword $1) $(call remduplicates,$(filter-out $(firstword $1),$1))))
@@ -53,6 +53,7 @@ C_SOURCE_FILES += \
 ../../../../../../components/drivers_nrf/pstorage/pstorage.c \
 ../../../../../bsp/bsp.c \
 ../../../main.c \
+../../../ble_lbs.c \
 ../../../../../../components/ble/common/ble_advdata.c \
 ../../../../../../components/ble/ble_advertising/ble_advertising.c \
 ../../../../../../components/ble/common/ble_conn_params.c \
@@ -64,7 +65,7 @@ C_SOURCE_FILES += \
 ASM_SOURCE_FILES  = ../../../../../../components/toolchain/gcc/gcc_startup_nrf52.s
 
 #includes common to all targets
-INC_PATHS  = -I../../../config
+INC_PATHS += -I../../../config
 INC_PATHS += -I../../../../../../components/libraries/scheduler
 INC_PATHS += -I../../../../../../components/drivers_nrf/config
 INC_PATHS += -I../../../../../bsp
@@ -87,6 +88,7 @@ INC_PATHS += -I../../../../../../components/drivers_nrf/common
 INC_PATHS += -I../../../../../../components/ble/ble_advertising
 INC_PATHS += -I../../../../../../components/libraries/trace
 INC_PATHS += -I../../../../../../components/softdevice/common/softdevice_handler
+INC_PATHS += -I../../../../nRF52-ble-app-lbs
 
 OBJECT_DIRECTORY = _build
 LISTING_DIRECTORY = $(OBJECT_DIRECTORY)
@@ -99,7 +101,7 @@ BUILD_DIRECTORIES := $(sort $(OBJECT_DIRECTORY) $(OUTPUT_BINARY_DIRECTORY) $(LIS
 CFLAGS  = -DSWI_DISABLE0
 CFLAGS += -DSOFTDEVICE_PRESENT
 CFLAGS += -DNRF52
-CFLAGS += -DBOARD_PCA10036
+CFLAGS += -DBOARD_PCA10040
 CFLAGS += -DCONFIG_GPIO_AS_PINRESET
 CFLAGS += -DS132
 CFLAGS += -DBLE_STACK_SUPPORT_REQD
@@ -126,7 +128,7 @@ ASMFLAGS += -x assembler-with-cpp
 ASMFLAGS += -DSWI_DISABLE0
 ASMFLAGS += -DSOFTDEVICE_PRESENT
 ASMFLAGS += -DNRF52
-ASMFLAGS += -DBOARD_PCA10036
+ASMFLAGS += -DBOARD_PCA10040
 ASMFLAGS += -DCONFIG_GPIO_AS_PINRESET
 ASMFLAGS += -DS132
 ASMFLAGS += -DBLE_STACK_SUPPORT_REQD
@@ -220,9 +222,9 @@ cleanobj:
 	$(RM) $(BUILD_DIRECTORIES)/*.o
 
 flash: $(MAKECMDGOALS)
-	@echo Flashing: $(OUTPUT_BINARY_DIRECTORY)/$<.hex
+	@echo Flashing: $(OUTPUT_BINARY_DIRECTORY)/nrf52832_xxaa_s132.hex
 	nrfjprog --erasepage 0x1f000-0x80000 -f nrf52
-	nrfjprog --program $(OUTPUT_BINARY_DIRECTORY)/$<.hex -f nrf52
+	nrfjprog --program $(OUTPUT_BINARY_DIRECTORY)/nrf52832_xxaa_s132.hex -f nrf52
 	nrfjprog --reset
 
 ## Flash softdevice
