@@ -1,3 +1,43 @@
+# Embedded Studio build files
+Firmware/Project/Embedded_Studio/Output/
+Firmware/Project/Embedded_Studio/ble_app_template_s132_pca10040.emSession
+
+# Mac OS X specifc
+.DS_Store
+
+# Object files
+*.o
+*.ko
+*.obj
+*.elf
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+
+# Debug files
+*.dSYM/
+
 *.axf
 *.htm
 *.Inp
