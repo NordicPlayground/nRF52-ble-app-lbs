@@ -25,14 +25,12 @@ Please post any questions about this project on https://devzone.nordicsemi.com.
 
 How to get started
 ------------------
-Clone the repository in the [SDK]/examples/ble_peripheral folder. (Directory structure should now look like [SDK]/examples/ble_peripheral/nrf52-ble-app-lbs).
-Next either open the Keil project file in .../arm5_no_packs and build or type 'make' in .../armgcc.
-Flash the s132 softdevice ('make flash_softdevice' command for gcc) and then flash the application ('make flash').
-
-Now that the application is running on the nRF52 DK you can either test with one of the nRF Blinky android/iOS apps or the Master Control Panel (android/iOS app or PC).
-
-nRF Blinky (Android): https://play.google.com/store/apps/details?id=no.nordicsemi.android.nrfblinky
-Master Control Panel (Android): https://play.google.com/store/apps/details?id=no.nordicsemi.android.mcp
+1. Clone the repository in the [SDK]/examples/ble_peripheral folder. (Directory structure should now look like [SDK]/examples/ble_peripheral/nrf52-ble-app-lbs).
+2. Next either open the Keil project file in .../arm5_no_packs and build or type 'make' in .../armgcc.
+3. Flash the s132 softdevice ('make flash_softdevice' command for gcc) and then flash the application ('make flash').
+4. Now that the application is running on the nRF52 DK you can either test with one of the following:
+  * nRF Blinky [Android](https://play.google.com/store/apps/details?id=no.nordicsemi.android.nrfblinky)
+  * Master Control Panel ([Android](https://play.google.com/store/apps/details?id=no.nordicsemi.android.mcp)/[iOS](https://itunes.apple.com/us/app/nrf-master-control-panel-ble/id1054362403?mt=8) or [PC](https://www.nordicsemi.com/eng/nordic/download_resource/38907/28/19937796)).
 
 You will be able to blink the LED on the nRF52 from nRF Blinky or by writing to the LED characteristic in MCP.
 You can push Button 1 on the nRF52 DK and see the screen light up in nRF Blinky and see the Button characteristic updated in MCP.
